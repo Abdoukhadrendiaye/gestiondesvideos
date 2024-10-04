@@ -1,0 +1,21 @@
+
+// Récupérer l'utilisateur connecté
+$username = $_SESSION['username'];
+
+// Récupérer l'ID de l'utilisateur
+$stmt = $conn->prepare("SELECT id FROM users WHERE username = ?");
+$stmt->bind_param("s", $username);
+$stmt->execute();
+$result = $stmt->get_result();
+$user = $result->fetch_assoc();
+$user_id = $user['id'];
+
+// Si un ID de vidéo a été soumis
+if (isset($_POST['videoId']) && !empty($_POST['videoId'])) {
+    $videoId = htmlspecialchars($_POST['videoId']);
+    
+    // Insérer dans l'historique avec l'ID de l'utilisateur
+    $stmt = $conn->prepare("INSERT INTO historique_videos (video_id, user_id) VALUES (?, ?)");
+    $stmt->bind_param("si", $videoId, $user_id);
+    $stmt->execute();
+}
